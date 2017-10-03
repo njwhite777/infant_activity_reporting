@@ -26,8 +26,10 @@ class InfantHealthMS(object):
                 self.parse(row)
 
         elif( file_type == 'JSON' ):
-
+            # all_data =
             pass
+
+
         fh.close()
         return True
 
@@ -60,10 +62,10 @@ class InfantHealthMS(object):
     def parse(self,aDict,tRow=None):
 
         c_date = aDict['date']
+        print(aDict)
 
         if(c_date not in self.data):
             self.data[c_date] = dict()
-
 
         if( 'posture' in aDict ):
             if('sleep' not in self.data[c_date] ):
@@ -78,6 +80,9 @@ class InfantHealthMS(object):
 
             t_dict = self._buid_time_dict(aDict)
             self.data[c_date]['posture'].append(t_dict)
+
+    def getData(self):
+        return self.data
 
     def getDailyData(self,date):
         return self.data[date]
@@ -137,7 +142,8 @@ class InfantCryMS(InfantHealthMS):
 
 def main():
     ih_test = InfantHealthMS()
-    ih
+    ih_test.readData(file_path="./data/test_data.json",file_type='JSON')
+    print(ih_test.getData())
 
 if(__name__ == '__main__'):
     main()
