@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import csv
 import json
+import datetime
 from csv import DictReader
 from collections import OrderedDict
 
@@ -30,8 +31,18 @@ class InfantHealthMS(object):
         fh.close()
         return True
 
-    def _buid_time_dict(self):
-        pass
+    def _buid_time_dict(self,aDict):
+
+        d = {
+            'time_start': datetime.strptime(aDict['date'] + " " + aDict['time_start'], '%Y%m%d %H:%M:%S'),
+            'time_end': datetime.strptime(aDict['date'] + " " + aDict['time_end'], '%Y%m%d %H:%M:%S'),
+            'duration': aDict['duration']
+        }
+
+        if('posture' in aDict):
+            d['posture'] = aDict['posture']
+
+        return d
 
     def parse(self,aDict,tRow=None):
 
@@ -42,17 +53,19 @@ class InfantHealthMS(object):
 
 
         if( 'posture' in aDict ):
-            if('posture' not in self.data[c_date] ):
-                self.data[c_date]['posture'] = list()
+            if('sleep' not in self.data[c_date] ):
+                self.data[c_date]['sleep'] = list()
 
-            # t_dict =
-            # self.data[c_date]['posture'].append()
+            t_dict = self._buid_time_dict(aDict)
+            self.data[c_date]['posture'].append(t_dict)
 
         elif( 'cry' in aDict ):
             if('cry' not in self.data[c_date] ):
                 self.data[c_date]['cry'] = list()
 
-        pass
+            t_dict = self._buid_time_dict(aDict)
+            self.data[c_date]['posture'].append(t_dict)
+
 
     def getDailyData(self):
         pass
