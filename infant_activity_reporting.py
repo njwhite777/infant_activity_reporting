@@ -89,9 +89,10 @@ class InfantHealthMS(object):
 
     def getSlidingData(self,startDate,slidingWindow):
         slideData=dict()
-
-    def getSlidingData(self):
-        pass
+        for i in range(slidingWindow):
+            current_date=self._add_days_to_date(startDate,i)
+            current_date_str=current_date.tostring
+            slideData[current_date_str]=self.getDailyData(current_date_str)
 
     def getDailyCount(self):
         pass
