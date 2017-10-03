@@ -26,8 +26,11 @@ class InfantHealthMS(object):
                 self.parse(row)
 
         elif( file_type == 'JSON' ):
-            dr=json.load(fh)
-            for row in dr:
+
+
+            self.rawData = json.load(fh)
+            for row in self.rawData:
+
                 self.parse(row)
         fh.close()
         return True
@@ -50,7 +53,7 @@ class InfantHealthMS(object):
     def _buid_time_dict(self,aDict):
         d = {
             'time_start': self._timestamp_from_string(aDict['date'],aDict['time_start']),
-            'time_end': self._timestamp_from_string(aDict['date'],aDict['time_end']),
+            'time_stop': self._timestamp_from_string(aDict['date'],aDict['time_stop']),
             'duration': aDict['duration']
         }
         if('posture' in aDict):
@@ -61,7 +64,6 @@ class InfantHealthMS(object):
     def parse(self,aDict,tRow=None):
 
         c_date = aDict['date']
-        print(aDict)
 
         if(c_date not in self.data):
             self.data[c_date] = dict()
@@ -71,14 +73,14 @@ class InfantHealthMS(object):
                 self.data[c_date]['sleep'] = list()
 
             t_dict = self._buid_time_dict(aDict)
-            self.data[c_date]['posture'].append(t_dict)
+            self.data[c_date]['sleep'].append(t_dict)
 
-        elif( 'cry' in aDict ):
+        else:
             if('cry' not in self.data[c_date] ):
                 self.data[c_date]['cry'] = list()
 
             t_dict = self._buid_time_dict(aDict)
-            self.data[c_date]['posture'].append(t_dict)
+            self.data[c_date]['cry'].append(t_dict)
 
     def getData(self):
         return self.data
@@ -92,7 +94,7 @@ class InfantHealthMS(object):
             current_date=self._add_days_to_date(startDate,i)
             current_date_str=self._str_date_from_date(current_date)
             slideData[current_date_str]=self.getDailyData(current_date_str)
-            
+
         return slideData
 
     def getDailyCount(self,date, activity):
@@ -102,8 +104,7 @@ class InfantHealthMS(object):
 
     def getActivityData(self,activity, date, slidingWindow):
 
-        for k, v in self.getSlidingData(date,slidingWindow).items():
-            pass
+        pass
 
     def generateReport(self):
         pass
@@ -149,7 +150,10 @@ class InfantCryMS(InfantHealthMS):
 def main():
     ih_test = InfantHealthMS()
     ih_test.readData(file_path="./data/test_data.json",file_type='JSON')
-    print(ih_test.getData())
+
+    # print(ih_test.getData())
+    # print(ih_test.getDailyData('20170901'))
+    print(ih_test.getSlidingData('20170901',3))
 
 if(__name__ == '__main__'):
     main()
