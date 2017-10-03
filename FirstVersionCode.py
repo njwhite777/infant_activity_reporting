@@ -43,12 +43,11 @@ class InfantHealthMS(object):
 
         if( 'posture' in aDict ):
             if('posture' not in self.data[c_date] ):
-                self.data[c_date]['posture'] = list()
-
+                self.data[c_date]['sleep'] = list()
             # t_dict =
             # self.data[c_date]['posture'].append()
 
-        elif( 'cry' in aDict ):
+        else:
             if('cry' not in self.data[c_date] ):
                 self.data[c_date]['cry'] = list()
 
