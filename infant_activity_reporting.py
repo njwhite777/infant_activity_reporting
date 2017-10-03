@@ -3,7 +3,7 @@ import csv
 import json
 import datetime
 from csv import DictReader
-    from collections import OrderedDict
+from collections import OrderedDict
 
 class InfantHealthMS(object):
 
@@ -74,13 +74,17 @@ class InfantHealthMS(object):
             self.data[c_date]['posture'].append(t_dict)
 
     def getData(self):
-        returns self.data
+        return self.data
 
-    def getDailyData(self):
-        pass
+    def getDailyData(self,date):
+        return self.data[date]
 
-    def getSlidingData(self):
-        pass
+    def getSlidingData(self,startDate,slidingWindow):
+        slideData=dict()
+        for i in range(slidingWindow):
+            current_date=self._add_days_to_date(startDate,i)
+            current_date_str=current_date.tostring
+            slideData[current_date_str]=self.getDailyData(current_date_str)
 
     def getDailyCount(self):
         pass
@@ -131,7 +135,7 @@ class InfantCryMS(InfantHealthMS):
 
 def main():
     ih_test = InfantHealthMS()
-    ih
+
 
 if(__name__ == '__main__'):
     main()
