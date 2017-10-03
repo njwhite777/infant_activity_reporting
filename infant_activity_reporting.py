@@ -3,7 +3,7 @@ import csv
 import json
 import datetime
 from csv import DictReader
-from collections import OrderedDict
+    from collections import OrderedDict
 
 class InfantHealthMS(object):
 
@@ -26,10 +26,19 @@ class InfantHealthMS(object):
                 self.parse(row)
 
         elif( file_type == 'JSON' ):
-            # TODO: implement JSON import
+
             pass
         fh.close()
         return True
+
+    def _add_days_to_date(self,date,days):
+        return self._date_from_string(date) + datetime.timedelta(days=days)
+
+    def _date_from_string(self,date):
+        return datetime.strptime(date,'%Y%m%d')
+
+    def _timestamp_from_string(self,timestamp):
+        return datetime.strptime(timestamp,'%H:%M:%S')
 
     def _buid_time_dict(self,aDict):
         d = {
@@ -122,7 +131,7 @@ class InfantCryMS(InfantHealthMS):
 
 def main():
     ih_test = InfantHealthMS()
-
+    ih
 
 if(__name__ == '__main__'):
     main()
