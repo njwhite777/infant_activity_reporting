@@ -91,6 +91,10 @@ class InfantHealthMS(object):
             current_date=self._add_days_to_date(startDate,i)
             current_date_str=self._str_date_from_date(current_date)
             slideData[current_date_str]=self.getDailyData(current_date_str)
+<<<<<<< HEAD
+=======
+            
+>>>>>>> 6b84903e1f44a254cddf359e3a88a4b1e6116a2a
         return slideData
 
     def getDailyCount(self):
