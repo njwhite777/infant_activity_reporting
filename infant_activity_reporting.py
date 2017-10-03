@@ -1,9 +1,9 @@
 #!/usr/bin/python
 import csv
 import json
-import datetime
+from datetime import datetime, timedelta
 from csv import DictReader
-    from collections import OrderedDict
+from collections import OrderedDict
 
 class InfantHealthMS(object):
 
@@ -32,18 +32,24 @@ class InfantHealthMS(object):
         return True
 
     def _add_days_to_date(self,date,days):
-        return self._date_from_string(date) + datetime.timedelta(days=days)
+        return self._date_from_string(date) + timedelta(days=days)
 
     def _date_from_string(self,date):
         return datetime.strptime(date,'%Y%m%d')
 
-    def _timestamp_from_string(self,timestamp):
-        return datetime.strptime(timestamp,'%H:%M:%S')
+    def _timestamp_from_string(self,date,timestamp):
+        return datetime.strptime(date + " " + timestamp,'%Y%m%d %H:%M:%S')
+
+    def _str_date_from_date(self,date_obj):
+        return date_obj.strftime('%Y%m%d')
+
+    def _str_timestammp_from_date(self,date_obj):
+        return date_obj.strftime('%H%M%S')
 
     def _buid_time_dict(self,aDict):
         d = {
-            'time_start': datetime.strptime(aDict['date'] + " " + aDict['time_start'], '%Y%m%d %H:%M:%S'),
-            'time_end': datetime.strptime(aDict['date'] + " " + aDict['time_end'], '%Y%m%d %H:%M:%S'),
+            'time_start': self._timestamp_from_string(aDict['date'],aDict['time_start']),
+            'time_end': self._timestamp_from_string(aDict['date'],aDict['time_end']),
             'duration': aDict['duration']
         }
         if('posture' in aDict):
@@ -73,11 +79,11 @@ class InfantHealthMS(object):
             t_dict = self._buid_time_dict(aDict)
             self.data[c_date]['posture'].append(t_dict)
 
-    def getData(self):
-        returns self.data
+    def getDailyData(self,date):
+        return self.data[date]
 
-    def getDailyData(self):
-        pass
+    def getSlidingData(self,startDate,slidingWindow):
+        slideData=dict()
 
     def getSlidingData(self):
         pass
