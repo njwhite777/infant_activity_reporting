@@ -26,8 +26,9 @@ class InfantHealthMS(object):
                 self.parse(row)
 
         elif( file_type == 'JSON' ):
-            # TODO: implement JSON import
-            pass
+            self.rawData=json.load(fh)
+            for row in self.rawData:
+                self.parse(row)
         fh.close()
         return True
 
@@ -68,11 +69,12 @@ class InfantHealthMS(object):
             self.data[c_date]['posture'].append(t_dict)
 
 
-    def getDailyData(self):
-        pass
+    def getDailyData(self,date):
+        return self.data[date]
 
-    def getSlidingData(self):
-        pass
+    def getSlidingData(self,startDate,slidingWindow):
+        slideData=dict()
+
 
     def getDailyCount(self):
         pass
