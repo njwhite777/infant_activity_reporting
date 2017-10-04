@@ -11,7 +11,7 @@ class InfantHealthMS(object):
         self.rawData = list()
         self.data = OrderedDict()
 
-    def readData(self,file_path,file_type='CSV'):
+    def readData(self,file_path,file_type):
 
         try:
             fh = open(file_path,'r')
@@ -26,8 +26,11 @@ class InfantHealthMS(object):
                 self.parse(row)
 
         elif( file_type == 'JSON' ):
+
+
             self.rawData = json.load(fh)
             for row in self.rawData:
+
                 self.parse(row)
         fh.close()
         return True
@@ -104,10 +107,13 @@ class InfantHealthMS(object):
             slideData[current_date_str]=self.getDailyData(current_date_str)
         return slideData
 
-    def getDailyCount(self):
-        pass
+    def getDailyCount(self,date, activity):
 
-    def getActivityData(self):
+        return len(self.getDailyData(date)[activity])
+
+
+    def getActivityData(self,activity, date, slidingWindow):
+
         pass
 
     def generateReport(self):
