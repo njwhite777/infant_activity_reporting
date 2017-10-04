@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fbb858db-b442-44a5-9d4b-5482180b562c" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/infant_activity_reporting.py" afterPath="$PROJECT_DIR$/infant_activity_reporting.py" />
-    </list>
+    <list default="true" id="fbb858db-b442-44a5-9d4b-5482180b562c" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -26,8 +24,8 @@
       <file leaf-file-name="infant_activity_reporting.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/infant_activity_reporting.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="463">
-              <caret line="129" column="60" lean-forward="true" selection-start-line="129" selection-start-column="60" selection-end-line="129" selection-end-column="60" />
+            <state relative-caret-position="1768">
+              <caret line="104" column="0" lean-forward="true" selection-start-line="104" selection-start-column="0" selection-end-line="104" selection-end-column="0" />
               <folding>
                 <element signature="e#18#28#0" expanded="true" />
               </folding>
@@ -298,8 +296,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/infant_activity_reporting.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="463">
-          <caret line="129" column="60" lean-forward="true" selection-start-line="129" selection-start-column="60" selection-end-line="129" selection-end-column="60" />
+        <state relative-caret-position="1768">
+          <caret line="104" column="0" lean-forward="true" selection-start-line="104" selection-start-column="0" selection-end-line="104" selection-end-column="0" />
           <folding>
             <element signature="e#18#28#0" expanded="true" />
           </folding>
