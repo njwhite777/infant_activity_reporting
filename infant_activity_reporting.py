@@ -27,7 +27,6 @@ class InfantHealthMS(object):
 
         elif( file_type == 'JSON' ):
 
-
             self.rawData = json.load(fh)
             for row in self.rawData:
 
@@ -104,7 +103,33 @@ class InfantHealthMS(object):
 
     def getActivityData(self,activity, date, slidingWindow):
 
-        pass
+        total_sleep_time=0
+        the_number_of_sleeps=0
+        posture_duration={}
+        total_cry_time=0
+        the_number_of_cries=0
+        if(activity=='sleep'):
+            for k,v in self.getSlidingData(date,slidingWindow).items():
+                for i in range(len(v['sleep'])):
+                    total_sleep_time+=int(v['sleep'][i]['duration'])
+                    if(v['sleep'][i]['posture'] not in posture_duration):
+                        posture_duration[v['sleep'][i]['posture']]=0
+                    posture_duration[v['sleep'][i]['posture']]+=int(v['sleep'][i]['duration'])
+                the_number_of_sleeps+=len(v['sleep'])
+
+        else:
+            for k,v in self.getSlidingData(date,slidingWindow).items():
+                for i in range(len(v['cry'])):
+                    total_cry_time+=int(v['cry'][i]['duration'])
+                the_number_of_cries+=len(v['cry'])
+
+        return {'total_sleep_time':total_sleep_time
+                ,'the_number_of_sleeps': the_number_of_sleeps
+                ,'posture_duration':posture_duration
+                ,'total_cry_time':total_cry_time
+                ,'the_number_of_cries': the_number_of_cries}
+
+
 
     def generateReport(self):
         pass
@@ -154,6 +179,7 @@ def main():
     # print(ih_test.getData())
     # print(ih_test.getDailyData('20170901'))
     print(ih_test.getSlidingData('20170901',3))
+    ih_test.getActivityData(activity='sleep',date='20170901',slidingWindow=3)
 
 if(__name__ == '__main__'):
     main()
