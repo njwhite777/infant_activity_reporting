@@ -118,6 +118,7 @@ class InfantHealthMS(object):
         posture_duration={}
         total_cry_time=0
         the_number_of_cries=0
+        dict_half_hour={}
         if(activity=='sleep'):
             for k,v in self.getSlidingData(date,slidingWindow).items():
                 for i in range(len(v['sleep'])):
@@ -126,12 +127,15 @@ class InfantHealthMS(object):
                         posture_duration[v['sleep'][i]['posture']]=0
                     posture_duration[v['sleep'][i]['posture']]+=int(v['sleep'][i]['duration'])
                 the_number_of_sleeps+=len(v['sleep'])
-
         else:
-            for k,v in self.getSlidingData(date,slidingWindow).items():
-                for i in range(len(v['cry'])):
-                    total_cry_time+=int(v['cry'][i]['duration'])
-                the_number_of_cries+=len(v['cry'])
+            try:
+                for k,v in self.getSlidingData(date,slidingWindow).items():
+
+                    for i in range(len(v['cry'])):
+                        total_cry_time+=int(v['cry'][i]['duration'])
+                    the_number_of_cries+=len(v['cry'])
+            except(KeyError):
+                pass
 
         return {'total_sleep_time':total_sleep_time
                 ,'the_number_of_sleeps': the_number_of_sleeps
@@ -189,7 +193,7 @@ def main():
     # print(ih_test.getData())
     # print(ih_test.getDailyData('20170901'))
     print(ih_test.getSlidingData('20170901',3))
-    ih_test.getActivityData(activity='sleep',date='20170901',slidingWindow=3)
+    print(ih_test.getActivityData(activity='cry',date='20170901',slidingWindow=3))
 
     print(ih_test._round_timestamp_to_nearest_30(datetime.now()))
 
