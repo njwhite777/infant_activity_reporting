@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import csv
 import json
 from datetime import datetime, timedelta
@@ -33,6 +33,17 @@ class InfantHealthMS(object):
                 self.parse(row)
         fh.close()
         return True
+
+    # Thanks to the SO answer here:
+    # https://stackoverflow.com/questions/32723150/rounding-up-to-nearest-30-minutes-in-python
+    # for the idea on how to do with datetime object.
+    # Note: the mod operation is a python3 operator (doesn't work with py2).
+    def _round_timestamp_to_nearest_30(self,timestamp,round_mins=30):
+        round_mins = timedelta(minutes=round_mins)
+        if( not((datetime.min - timestamp) % round_mins) > (round_mins / 2) ):
+            return (timestamp + (datetime.min - timestamp) % round_mins)
+        else:
+            return (timestamp + (((datetime.min - timestamp) % round_mins) - round_mins))
 
     def _add_days_to_date(self,date,days):
         return self._date_from_string(date) + timedelta(days=days)
@@ -93,7 +104,6 @@ class InfantHealthMS(object):
             current_date=self._add_days_to_date(startDate,i)
             current_date_str=self._str_date_from_date(current_date)
             slideData[current_date_str]=self.getDailyData(current_date_str)
-
         return slideData
 
     def getDailyCount(self,date, activity):
@@ -180,6 +190,8 @@ def main():
     # print(ih_test.getDailyData('20170901'))
     print(ih_test.getSlidingData('20170901',3))
     ih_test.getActivityData(activity='sleep',date='20170901',slidingWindow=3)
+
+    print(ih_test._round_timestamp_to_nearest_30(datetime.now()))
 
 if(__name__ == '__main__'):
     main()
