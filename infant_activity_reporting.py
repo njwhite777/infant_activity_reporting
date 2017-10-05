@@ -107,7 +107,7 @@ class InfantHealthMS(object):
     def getDailyCount(self):
         pass
 
-    def getActivityData(self):
+    def getActivityData(self,activity,date,slidingWindow):
         total_sleep_time=0
         the_number_of_sleeps=0
         posture_duration={}
