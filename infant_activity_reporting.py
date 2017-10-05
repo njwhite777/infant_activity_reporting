@@ -108,7 +108,35 @@ class InfantHealthMS(object):
         pass
 
     def getActivityData(self):
-        pass
+        total_sleep_time=0
+        the_number_of_sleeps=0
+        posture_duration={}
+        total_cry_time=0
+        the_number_of_cries=0
+        dict_half_hour={}
+        if(activity=='sleep'):
+            for k,v in self.getSlidingData(date,slidingWindow).items():
+                for i in range(len(v['sleep'])):
+                    total_sleep_time+=int(v['sleep'][i]['duration'])
+                    if(v['sleep'][i]['posture'] not in posture_duration):
+                        posture_duration[v['sleep'][i]['posture']]=0
+                    posture_duration[v['sleep'][i]['posture']]+=int(v['sleep'][i]['duration'])
+                the_number_of_sleeps+=len(v['sleep'])
+        else:
+            try:
+                for k,v in self.getSlidingData(date,slidingWindow).items():
+
+                    for i in range(len(v['cry'])):
+                        total_cry_time+=int(v['cry'][i]['duration'])
+                    the_number_of_cries+=len(v['cry'])
+            except(KeyError):
+                pass
+
+        return {'total_sleep_time':total_sleep_time
+                ,'the_number_of_sleeps': the_number_of_sleeps
+                ,'posture_duration':posture_duration
+                ,'total_cry_time':total_cry_time
+                ,'the_number_of_cries': the_number_of_cries}
 
     def generateReport(self):
         pass
@@ -154,7 +182,12 @@ class InfantCryMS(InfantHealthMS):
 def main():
     ih_test = InfantHealthMS()
     ih_test.readData(file_path="./data/test_data.json",file_type='JSON')
-    
+    # print(ih_test.getData())
+    # print(ih_test.getDailyData('20170901'))
+    print(ih_test.getSlidingData('20170901',3))
+    print(ih_test.getActivityData(activity='cry',date='20170901',slidingWindow=3))
+    print(ih_test._round_timestamp_to_nearest_30(datetime.now()))
+
 
 if(__name__ == '__main__'):
     main()
