@@ -36,7 +36,7 @@ class InfantHealthMS(object):
     # https://stackoverflow.com/questions/32723150/rounding-up-to-nearest-30-minutes-in-python
     # for the idea on how to do with datetime object.
     # Note: the mod operation is a python3 operator (doesn't work with py2).
-    def _round_timestamp_to_nearest_30(self,timestamp,round_mins=30):
+    def _round_timestamp_to_nearest_interval(self,timestamp,round_mins=30):
         round_mins = timedelta(minutes=round_mins)
         if( not((datetime.min - timestamp) % round_mins) > (round_mins / 2) ):
             return (timestamp + (datetime.min - timestamp) % round_mins)
@@ -55,8 +55,8 @@ class InfantHealthMS(object):
     def _str_date_from_date(self,date_obj):
         return date_obj.strftime('%Y%m%d')
 
-    def _str_timestammp_from_date(self,date_obj):
-        return date_obj.strftime('%H%M%S')
+    def _str_timestamp_from_date(self,date_obj):
+        return date_obj.strftime('%H:%M:%S')
 
     def _buid_time_dict(self,aDict):
         d = {
@@ -186,7 +186,6 @@ def main():
     # print(ih_test.getDailyData('20170901'))
     print(ih_test.getSlidingData('20170901',3))
     print(ih_test.getActivityData(activity='cry',date='20170901',slidingWindow=3))
-    print(ih_test._round_timestamp_to_nearest_30(datetime.now()))
 
 
 if(__name__ == '__main__'):
