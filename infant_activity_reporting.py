@@ -39,9 +39,9 @@ class InfantHealthMS(object):
     def _round_timestamp_to_nearest_30(self,timestamp,round_mins=30):
         round_mins = timedelta(minutes=round_mins)
         if( not((datetime.min - timestamp) % round_mins) > (round_mins / 2) ):
-            return (timestamp + (datetime.min - timestamp) % round_mins)
+            return self._str_timestammp_from_date(timestamp + (datetime.min - timestamp) % round_mins)  #Convert Datetime type to Str
         else:
-            return (timestamp + (((datetime.min - timestamp) % round_mins) - round_mins))
+            return self._str_timestammp_from_date(timestamp + (((datetime.min - timestamp) % round_mins) - round_mins)) #Convert Datetime type to Str
 
     def _add_days_to_date(self,date,days):
         return self._date_from_string(date) + timedelta(days=days)
@@ -56,7 +56,7 @@ class InfantHealthMS(object):
         return date_obj.strftime('%Y%m%d')
 
     def _str_timestammp_from_date(self,date_obj):
-        return date_obj.strftime('%H%M%S')
+        return date_obj.strftime('%H:%M:%S')
 
     def _buid_time_dict(self,aDict):
         d = {
@@ -120,6 +120,11 @@ class InfantHealthMS(object):
                     total_sleep_time+=int(v['sleep'][i]['duration'])
                     if(v['sleep'][i]['posture'] not in posture_duration):
                         posture_duration[v['sleep'][i]['posture']]=0
+
+                    if(self._round_timestamp_to_nearest_30(v['sleep'][i]['time_start']) not in dict_half_hour):
+                        dict_half_hour[self._round_timestamp_to_nearest_30(v['sleep'][i]['time_start'])]={'count':0,'dates':[]}
+                    dict_half_hour[self._round_timestamp_to_nearest_30(v['sleep'][i]['time_start'])]['count']+=1
+                    dict_half_hour[self._round_timestamp_to_nearest_30(v['sleep'][i]['time_start'])]['dates'].append(k)
                     posture_duration[v['sleep'][i]['posture']]+=int(v['sleep'][i]['duration'])
                 the_number_of_sleeps+=len(v['sleep'])
         else:
@@ -128,6 +133,11 @@ class InfantHealthMS(object):
 
                     for i in range(len(v['cry'])):
                         total_cry_time+=int(v['cry'][i]['duration'])
+                        if(self._round_timestamp_to_nearest_30(v['cry'][i]['time_start']) not in dict_half_hour):
+                            dict_half_hour[self._round_timestamp_to_nearest_30(v['cry'][i]['time_start'])]={'count':0,'dates':[]}
+                        dict_half_hour[self._round_timestamp_to_nearest_30(v['cry'][i]['time_start'])]['count']+=1
+                        dict_half_hour[self._round_timestamp_to_nearest_30(v['cry'][i]['time_start'])]['dates'].append(k)
+
                     the_number_of_cries+=len(v['cry'])
             except(KeyError):
                 pass
@@ -136,7 +146,8 @@ class InfantHealthMS(object):
                 ,'the_number_of_sleeps': the_number_of_sleeps
                 ,'posture_duration':posture_duration
                 ,'total_cry_time':total_cry_time
-                ,'the_number_of_cries': the_number_of_cries}
+                ,'the_number_of_cries': the_number_of_cries
+                ,'dict_half_hour':dict_half_hour}
 
     def generateReport(self):
         pass
@@ -185,8 +196,9 @@ def main():
     # print(ih_test.getData())
     # print(ih_test.getDailyData('20170901'))
     print(ih_test.getSlidingData('20170901',3))
-    print(ih_test.getActivityData(activity='cry',date='20170901',slidingWindow=3))
-    print(ih_test._round_timestamp_to_nearest_30(datetime.now()))
+#    print(ih_test.getSlidingData('20170901',3)['20170901']['cry'][0]['time_start'])
+    print(ih_test.getActivityData(activity='sleep',date='20170901',slidingWindow=5)['dict_half_hour'])
+    print(ih_test._round_timestamp_to_nearest_30(ih_test.getSlidingData('20170901',3)['20170901']['sleep'][0]['time_start']))
 
 
 if(__name__ == '__main__'):
