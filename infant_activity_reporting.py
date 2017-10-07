@@ -46,6 +46,9 @@ class InfantHealthMS(object):
 
     def _add_days_to_date(self,date,days):
         return self._date_from_string(date) + timedelta(days=days)
+        
+    def _subtract_days_from_date(self,date,days):
+        return self._date_from_string(date) - timedelta(days=days)
 
     def _date_from_string(self,date):
         return datetime.strptime(date,'%Y%m%d')
@@ -113,10 +116,8 @@ class InfantHealthMS(object):
         pass
 
     def getActivityData(self,activity,date,slidingWindow):
-        total_sleep_time    = 0
-        total_cry_time      = 0
-        the_number_of_sleeps= 0
-        the_number_of_cries = 0
+        total_time          = 0
+        count_of_activity   = 0
         posture_duration    = {}
         dict_half_hour      = {}
         likely_event_start  = []
@@ -128,71 +129,64 @@ class InfantHealthMS(object):
             event_threshold = 21
 
         sd = self.getSlidingData(date,slidingWindow).items()
+        
+        
+        # if(activity=='sleep'):
+            
+        for k,v in sd:
+            
+            if(activity not in v):
+                continue
+                
+            for i in range( len(v[activity]) ):
+                total_time+=int(v[ activity ][i]['duration'])
+                
+                if( activity == 'sleep' and v[ activity ][i]['posture'] not in posture_duration):
+                    posture_duration[v['sleep'][i]['posture']]=0
 
-        if(activity=='sleep'):
-            for k,v in sd:
-                for i in range(len(v['sleep'])):
-                    total_sleep_time+=int(v['sleep'][i]['duration'])
-                    if(v['sleep'][i]['posture'] not in posture_duration):
-                        posture_duration[v['sleep'][i]['posture']]=0
+                a_dict = v[activity][i]
+                st_timestamp = self._round_timestamp_to_nearest_interval(v[ activity ][ i ][ 'time_start' ])
 
-                    a_dict = v['sleep'][i]
-                    st_timestamp = self._round_timestamp_to_nearest_interval(v['sleep'][i]['time_start'])
+                if(st_timestamp not in dict_half_hour):
+                    dict_half_hour[ st_timestamp ]={ 'count' : 0, 'dates' : [] }
 
-                    if(st_timestamp not in dict_half_hour):
-                        dict_half_hour[ st_timestamp ]={'count':0,'dates':[]}
+                dict_half_hour[ st_timestamp ][ 'count' ] += 1
+                dict_half_hour[ st_timestamp ][ 'dates' ].append(k)
+                
+                if(dict_half_hour[ st_timestamp ][ 'count' ] >= event_threshold):
+                    if(st_timestamp not in likely_event_start):
+                        likely_event_start.append(st_timestamp)
 
-                    dict_half_hour[ st_timestamp ][ 'count' ] += 1
-                    if(dict_half_hour[ st_timestamp ][ 'count' ] >= event_threshold):
-                        if(st_timestamp not in likely_event_start):
-                            likely_event_start.append(st_timestamp)
-
-
-                    dict_half_hour[ st_timestamp ][ 'dates' ].append(k)
-
+                
+                if( activity == 'sleep' ):
                     posture_duration[ a_dict['posture'] ] += int( a_dict['duration'] )
 
-                the_number_of_sleeps += len(v['sleep'])
-        else:
-            try:
-                for k,v in sd:
-                    if('cry' not in v):
-                        continue
+            count_of_activity += len(v[activity])
 
-                    for i in range(len(v['cry'])):
-                        total_cry_time += int(v['cry'][i]['duration'])
-
-                        a_dict = v['cry'][i]
-                        st_timestamp = self._round_timestamp_to_nearest_interval(v['cry'][i]['time_start'])
-
-                        if( st_timestamp not in dict_half_hour ):
-                            dict_half_hour[ st_timestamp ]={'count':0,'dates':[]}
-
-                        dict_half_hour[st_timestamp]['count']+=1
-                        dict_half_hour[st_timestamp]['dates'].append(k)
-
-                        if(dict_half_hour[ st_timestamp ][ 'count' ] >= event_threshold):
-                            if(st_timestamp not in likely_event_start):
-                                likely_event_start.append(st_timestamp)
-
-                    the_number_of_cries+=len(v['cry'])
-
-            except(KeyError):
-                print("KEY ERROR!")
-
-        return {'total_sleep_time':total_sleep_time,
-                'the_number_of_sleeps': the_number_of_sleeps,
-                'posture_duration':posture_duration,
-                'total_cry_time':total_cry_time,
-                'the_number_of_cries': the_number_of_cries,
-                'dict_half_hour':dict_half_hour,
-                'likely_event_start': likely_event_start
+        return {
+                # 'total_sleep_time':total_sleep_time,
+                # 'total_cry_time':total_cry_time,
+                # 'the_number_of_sleeps': the_number_of_sleeps,
+                # 'the_number_of_cries': the_number_of_cries,
+                    'total_time'         :  total_time,
+                    'count_of_activity'  :  count_of_activity,
+                    'posture_duration'   :  posture_duration,
+                    'dict_half_hour'     :  dict_half_hour,
+                    'likely_event_start' :  likely_event_start
                 }
 
     def generateReport(self):
-        # Implement in the child classes.
         pass
-
+    
+    def report_from_current_date(self,duration='week',month_window=30):
+        c_time = datetime.now()
+        date = self._str_date_from_date(c_time)
+        if(duration == 'week'):
+            st_date = self._str_date_from_date(self._subtract_days_from_date(date,8))
+            self.generateReport(st_date,7)
+        if(duration == 'month'):
+            st_date = self._str_date_from_date(self._subtract_days_from_date(date,month_window+1))
+            self.generateReport(st_date,month_window)
 
 class InfantSleepMS(InfantHealthMS):
 
@@ -213,26 +207,33 @@ class InfantSleepMS(InfantHealthMS):
         pass
 
     def getActivityData(self,date,slidingWindow):
-        t_dict = super().getActivityData(activity='sleep',date=date,slidingWindow=slidingWindow)
-        del t_dict['total_cry_time']
-        del t_dict['the_number_of_cries']
-        return t_dict
+        return super().getActivityData(activity='sleep',date=date,slidingWindow=slidingWindow)
 
     def generateReport(self,date,slidingWindow):
+        
+        print("Sleep report for {} through {}".format(date,self._str_date_from_date(self._add_days_to_date(date,7))))
+        print("==============================================================================================")
         data = None
         if( slidingWindow == 1 ):
             data = self.getDailyData(date)
             pt = PrettyTable()
+            pt2 = PrettyTable()
             pt.field_names = ["Number of Naps","Total Sleep Time"]
-            pt.add_row( [data['the_number_of_sleeps'],data['total_sleep_time']] )
+            pt.add_row( [data['count_of_activity'],data['total_time']] )
+            pt2.field_names = data['posture_duration'].keys()
+            pt2.add_row(data['posture_duration'].values())
+            print("Basic stats:")
             print(pt)
+            print("Duration in Sleep Posture:")
+            print(pt2)
             print()
         else:
             data = self.getActivityData(date,slidingWindow=slidingWindow)
             pt = PrettyTable()
             pt1 = PrettyTable()
+            pt2 = PrettyTable()
             pt.field_names = ["Number of Naps","Total Sleep Time"]
-            pt.add_row( [data['the_number_of_sleeps'],data['total_sleep_time']] )
+            pt.add_row( [data['count_of_activity'],data['total_time']] )
             pt1.field_names = ['Time','Count','Dates']
             for hhi,hh_dict in data['dict_half_hour'].items():
                 pt1.add_row([hhi,hh_dict['count'],hh_dict['dates']])
@@ -240,8 +241,16 @@ class InfantSleepMS(InfantHealthMS):
             print(pt1)
             print("Basic stats:")
             print(pt)
+            if(not(data['posture_duration'] == {})):
+                print("Duration in Sleep Posture:")
+                pt2.field_names = data['posture_duration'].keys()
+                pt2.add_row(data['posture_duration'].values())
+                print(pt2)
             if( len(data['likely_event_start']) > 0 ):
                 print("Most likely sleep starting times",data['likely_event_start'])
+            print()
+            
+            
 
 class InfantCryMS(InfantHealthMS):
 
@@ -262,23 +271,21 @@ class InfantCryMS(InfantHealthMS):
         pass
 
     def getActivityData(self,date,slidingWindow):
-        # If we better encapsulate functionality in self.gad in the parent class, won't have to do
-        #  nasty dels...
         t_dict = super().getActivityData(activity='cry',date=date,slidingWindow=slidingWindow)
-        del t_dict['total_sleep_time']
-        del t_dict['the_number_of_sleeps']
         del t_dict['posture_duration']
         return t_dict
 
     def generateReport(self,date,slidingWindow):
 
         data = None
-
+        print()
+        print("Cry report for {} through {}".format(date,self._str_date_from_date(self._add_days_to_date(date,7))))
+        print("==============================================================================================")
         if( slidingWindow == 1 ):
             data = self.getDailyData(date)
             pt = PrettyTable()
             pt.field_names = ["Number of Cries","Total Cry Time"]
-            pt.add_row( [data['the_number_of_cries'],data['total_cry_time']] )
+            pt.add_row( [data['count_of_activity'],data['total_time']] )
             print(pt)
             print()
         else:
@@ -286,7 +293,7 @@ class InfantCryMS(InfantHealthMS):
             pt = PrettyTable()
             pt1 = PrettyTable()
             pt.field_names = ["Number of Cries","Total Cry Time"]
-            pt.add_row( [data['the_number_of_cries'],data['total_cry_time']] )
+            pt.add_row( [data['count_of_activity'],data['total_time']] )
             pt1.field_names = ['Time','Count','Dates']
             for hhi,hh_dict in data['dict_half_hour'].items():
                 pt1.add_row([hhi,hh_dict['count'],hh_dict['dates']])
@@ -322,13 +329,12 @@ def main():
 
     # ihc_test.generateReport(date='20170901',slidingWindow=1)
     # ihc_test.generateReport(date='20170902',slidingWindow=3)
-    ihs_test.generateReport(date='20170902',slidingWindow=1)
-    print()
-    ihc_test.generateReport(date='20170902',slidingWindow=1)
-    print()
-    ihs_test.generateReport(date='20170902',slidingWindow=7)
-    print()
-    ihc_test.generateReport(date='20170902',slidingWindow=7)
+    
+    # ihs_test.report_from_current_date(duration='week')
+    # ihs_test.report_from_current_date(duration='month')
+    
+    # ihc_test.report_from_current_date(duration='week')
+    ihc_test.report_from_current_date(duration='month')
     # ihc_test.generateReport(date='20170902',slidingWindow=8)
 
 
