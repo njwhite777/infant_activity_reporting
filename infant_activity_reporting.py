@@ -316,26 +316,16 @@ def main():
     ihs_test = InfantSleepMS()
     ihs_test.readData(file_path="./data/test_data.json",file_type='JSON')
 
-    # print(ih_test.getData())
-    # print(ih_test.getDailyData('20170901'))
-    # print(ih_test.getSlidingData('20170901',3))
-    # print(ih_test.getActivityData(activity='cry',date='20170901',slidingWindow=3))
-    # print(ih_test.getActivityData(activity='sleep',date='20170901',slidingWindow=5)['dict_half_hour'])
-    # print(ihs_test.getActivityData(date='20170901',slidingWindow=5)['dict_half_hour'])
-    # print(ihc_test.getActivityData(date='20170901',slidingWindow=5)['dict_half_hour'])
 
-    # ihc_test.generateReport(date='20170901',slidingWindow=5)
-    # print()
-
-    # ihc_test.generateReport(date='20170901',slidingWindow=1)
-    # ihc_test.generateReport(date='20170902',slidingWindow=3)
+    print()
+    ihs_test.report_from_current_date(duration='week')
+    print()
+    ihs_test.report_from_current_date(duration='month')
     
-    # ihs_test.report_from_current_date(duration='week')
-    # ihs_test.report_from_current_date(duration='month')
-    
-    # ihc_test.report_from_current_date(duration='week')
+    print()
+    ihc_test.report_from_current_date(duration='week')
+    print()
     ihc_test.report_from_current_date(duration='month')
-    # ihc_test.generateReport(date='20170902',slidingWindow=8)
 
 
 if(__name__ == '__main__'):
