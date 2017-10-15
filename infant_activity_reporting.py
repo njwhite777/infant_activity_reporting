@@ -97,9 +97,6 @@ class InfantHealthMS(object):
     def getData(self):
         return self.data
 
-    # def getDailyData(self,date):
-    #     return self.data[date]
-
     def getDailyData(self,date):
         return self.getActivityData(date,1)
 
@@ -211,7 +208,7 @@ class InfantSleepMS(InfantHealthMS):
 
     def generateReport(self,date,slidingWindow):
         
-        print("Sleep report for {} through {}".format(date,self._str_date_from_date(self._add_days_to_date(date,7))))
+        print("Sleep report for {} through {}".format(date,self._str_date_from_date(self._add_days_to_date(date,slidingWindow))))
         print("==============================================================================================")
         data = None
         if( slidingWindow == 1 ):
@@ -220,12 +217,13 @@ class InfantSleepMS(InfantHealthMS):
             pt2 = PrettyTable()
             pt.field_names = ["Number of Naps","Total Sleep Time"]
             pt.add_row( [data['count_of_activity'],data['total_time']] )
-            pt2.field_names = data['posture_duration'].keys()
-            pt2.add_row(data['posture_duration'].values())
             print("Basic stats:")
             print(pt)
-            print("Duration in Sleep Posture:")
-            print(pt2)
+            if( not(data['posture_duration'] == {}) ):
+                print("Duration in Sleep Posture:")
+                pt2.field_names = data['posture_duration'].keys()
+                pt2.add_row(data['posture_duration'].values())
+                print(pt2)
             print()
         else:
             data = self.getActivityData(date,slidingWindow=slidingWindow)
@@ -241,7 +239,7 @@ class InfantSleepMS(InfantHealthMS):
             print(pt1)
             print("Basic stats:")
             print(pt)
-            if(not(data['posture_duration'] == {})):
+            if( not(data['posture_duration'] == {}) ):
                 print("Duration in Sleep Posture:")
                 pt2.field_names = data['posture_duration'].keys()
                 pt2.add_row(data['posture_duration'].values())
@@ -279,7 +277,7 @@ class InfantCryMS(InfantHealthMS):
 
         data = None
         print()
-        print("Cry report for {} through {}".format(date,self._str_date_from_date(self._add_days_to_date(date,7))))
+        print("Cry report for {} through {}".format(date,self._str_date_from_date(self._add_days_to_date(date,slidingWindow))))
         print("==============================================================================================")
         if( slidingWindow == 1 ):
             data = self.getDailyData(date)
@@ -318,9 +316,23 @@ def main():
 
 
     print()
+    ihs_test.generateReport(date='20170901',slidingWindow=1)
+    ihs_test.generateReport(date='20170902',slidingWindow=1)
+    ihs_test.generateReport(date='20170903',slidingWindow=1)
+    ihs_test.generateReport(date='20170909',slidingWindow=1)
+    print()
+
+    print()
     ihs_test.report_from_current_date(duration='week')
     print()
     ihs_test.report_from_current_date(duration='month')
+    
+    print()
+    ihc_test.generateReport(date='20170901',slidingWindow=1)
+    ihc_test.generateReport(date='20170902',slidingWindow=1)
+    ihc_test.generateReport(date='20170903',slidingWindow=1)
+    ihc_test.generateReport(date='20170909',slidingWindow=1)
+    print()
     
     print()
     ihc_test.report_from_current_date(duration='week')
